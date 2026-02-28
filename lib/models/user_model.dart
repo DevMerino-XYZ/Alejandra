@@ -26,42 +26,24 @@ class UserModel {
   });
 
   /// 🔹 Factory seguro desde Map
-  factory UserModel.fromMap(Map<String, dynamic> map) {
-    // Campos obligatorios con nullable primero
-    final uid = map['uid'] as String?;
-    final employeeId = map['employeeId'] as String?;
-    final fullName = map['fullName'] as String?;
-    final email = map['email'] as String?;
-    final role = map['role'] as String?;
-    final company = map['company'] as String?;
-
-    if (uid == null ||
-        employeeId == null ||
-        fullName == null ||
-        email == null ||
-        role == null ||
-        company == null) {
-      throw Exception(
-          "UserModel.fromMap: missing required fields in Firestore document");
-    }
-
-    return UserModel(
-      uid: uid,
-      employeeId: employeeId,
-      fullName: fullName,
-      email: email,
-      role: role,
-      company: company,
-      sector: map['sector'] != null ? map['sector'] as String : null,
-      isActive: map['isActive'] as bool? ?? false,
-      createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      lastLogin: (map['lastLogin'] as Timestamp?)?.toDate(),
-    );
-  }
+factory UserModel.fromMap(Map<String, dynamic> map) {
+  return UserModel(
+    uid: map['uid'] as String? ?? '',
+    employeeId: map['employeeId'] as String? ?? '',
+    fullName: map['fullName'] as String? ?? '',
+    email: map['email'] as String? ?? '',
+    role: map['role'] as String? ?? 'auditor',
+    company: map['company'] as String? ?? '',
+    sector: map['sector'] != null ? map['sector'] as String : null,
+    isActive: map['isActive'] as bool? ?? false,
+    createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+    lastLogin: (map['lastLogin'] as Timestamp?)?.toDate(),
+  );
+}
 
   /// 🔹 Convertir a Map para Firestore
   Map<String, dynamic> toMap() {
-    final map = {
+    final map = <String, dynamic>{
       'uid': uid,
       'employeeId': employeeId,
       'fullName': fullName,
@@ -72,16 +54,8 @@ class UserModel {
       'createdAt': Timestamp.fromDate(createdAt),
     };
 
-    // Variables locales para evitar error de promoción de campo público
-    final sectorValue = sector;
-    if (sectorValue != null) {
-      map['sector'] = sectorValue;
-    }
-
-    final lastLoginValue = lastLogin;
-    if (lastLoginValue != null) {
-      map['lastLogin'] = Timestamp.fromDate(lastLoginValue);
-    }
+    if (sector != null) map['sector'] = sector;
+    if (lastLogin != null) map['lastLogin'] = Timestamp.fromDate(lastLogin!);
 
     return map;
   }

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-
+import '../services/auth_service.dart';
 import 'create_survey_screen.dart';
 import 'survey_history_screen.dart';
 import 'admin_home_screen.dart';
 import 'survey_list_screen.dart';
+import 'login_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   final String fullName;
@@ -20,16 +21,36 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Panel de Usuario"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout_rounded),
+            tooltip: "Cerrar sesión",
+            onPressed: () async {
+              await AuthService().logout(); // Llama a logout
+              
+              // Redirigir al LoginScreen
+              if (context.mounted) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  (route) => false,
+                );
+              }
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               /// 👋 BIENVENIDA
               Text(
-                "Bienvenido, $fullName 👋",
+                "Bienvenido, $fullName ",
                 style: Theme.of(context)
                     .textTheme
                     .headlineMedium
@@ -86,6 +107,7 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                 ],
               ),
+
               const SizedBox(height: 40),
 
               /// DIVISIÓN
