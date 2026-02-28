@@ -1,25 +1,15 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import '../utils/firestore_refs.dart';
+import '../models/user_model.dart';
 
 class UserService {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  Stream<Map<String, dynamic>?> getUser(String uid) {
-    return _db.collection('users').doc(uid).snapshots().map(
-          (doc) => doc.data(),
-        );
+  Future<void> createUser(UserModel user) async {
+    await FirestoreRefs.users.doc(user.uid).set(user.toMap());
   }
 
-  Stream<String> getUserRole(String uid) {
-    return _db
-        .collection('users')
-        .doc(uid)
-        .snapshots()
-        .map((doc) => doc.data()?['role'] ?? 'auditor');
-  }
-
-  Future<void> updateRole(String uid, String role) async {
-    await _db.collection('users').doc(uid).update({
-      "role": role,
-    });
+  Future<UserModel?> getUser(String uid) async {
+    final doc = await FirestoreRefs.users.doc(uid).get();
+    if (!doc.exists) return null;
+    return UserModel.fromMap(doc.data() as Map<String, dynamic>);
   }
 }

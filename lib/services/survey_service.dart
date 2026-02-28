@@ -1,47 +1,34 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import '../utils/firestore_refs.dart';
+import '../models/survey_model.dart';
+import '../models/question_model.dart';
 
 class SurveyService {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  // 🔹 Obtener encuestas activas
-  Stream<QuerySnapshot> getActiveSurveys() {
-    return _db
-        .collection('surveys')
+  Future<List<SurveyModel>> getActiveSurveys() async {
+    final snapshot = await FirestoreRefs.surveys
         .where('status', isEqualTo: 'active')
-        .orderBy('createdAt', descending: true)
-        .snapshots();
+        .get();
+
+    return snapshot.docs
+        .map((doc) => SurveyModel.fromMap(
+              doc.id,
+              doc.data() as Map<String, dynamic>,
+            ))
+        .toList();
   }
 
-  // 🔹 Crear encuesta
-  Future<void> createSurvey(Map<String, dynamic> data) async {
-    await _db.collection('surveys').add({
-      ...data,
-      "createdAt": FieldValue.serverTimestamp(),
-    });
-  }
-
-  // 🔹 Eliminar encuesta
-  Future<void> deleteSurvey(String surveyId) async {
-    await _db.collection('surveys').doc(surveyId).delete();
-  }
-
-  // 🔹 Agregar pregunta
-  Future<void> addQuestion(
-      String surveyId, Map<String, dynamic> data) async {
-    await _db
-        .collection('surveys')
-        .doc(surveyId)
-        .collection('questions')
-        .add(data);
-  }
-
-  // 🔹 Obtener preguntas
-  Stream<QuerySnapshot> getQuestions(String surveyId) {
-    return _db
-        .collection('surveys')
+  Future<List<QuestionModel>> getQuestions(String surveyId) async {
+    final snapshot = await FirestoreRefs.surveys
         .doc(surveyId)
         .collection('questions')
         .orderBy('order')
-        .snapshots();
+        .get();
+
+    return snapshot.docs
+        .map((doc) => QuestionModel.fromMap(
+              doc.id,
+              doc.data() as Map<String, dynamic>,
+            ))
+        .toList();
   }
 }

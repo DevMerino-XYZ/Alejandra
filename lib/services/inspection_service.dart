@@ -1,51 +1,38 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../utils/firestore_refs.dart';
+import '../models/response_model.dart';
 
 class InspectionService {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  // 🔹 Crear inspección
-  Future<DocumentReference> createInspection(
-      Map<String, dynamic> data) async {
-    return await _db.collection('inspections').add({
-      ...data,
-      "startedAt": FieldValue.serverTimestamp(),
-    });
+  Future<String> createInspection(Map<String, dynamic> data) async {
+    final doc = await FirestoreRefs.inspections.add(data);
+    return doc.id;
   }
 
-  // 🔹 Guardar respuesta
-  Future<void> saveResponse(String inspectionId,
-      Map<String, dynamic> data) async {
-    await _db
-        .collection('inspections')
+  Future<void> saveResponse({
+    required String inspectionId,
+    required ResponseModel response,
+  }) async {
+    await FirestoreRefs.inspections
         .doc(inspectionId)
         .collection('responses')
-        .add(data);
+        .doc(response.questionId)
+        .set(response.toMap());
   }
 
-  // 🔹 Finalizar inspección
-  Future<void> completeInspection(
-      String inspectionId, Map<String, dynamic> data) async {
-    await _db.collection('inspections').doc(inspectionId).update({
-      ...data,
-      "completedAt": FieldValue.serverTimestamp(),
-      "status": "completed",
+  Future<void> completeInspection({
+    required String inspectionId,
+    required double scoreTotal,
+    required double maxScore,
+  }) async {
+    final percentage = (scoreTotal / maxScore) * 100;
+
+    await FirestoreRefs.inspections.doc(inspectionId).update({
+      'status': 'completed',
+      'scoreTotal': scoreTotal,
+      'maxScore': maxScore,
+      'percentage': percentage,
+      'completedAt': FieldValue.serverTimestamp(),
     });
-  }
-
-  // 🔹 Admin: ver todas
-  Stream<QuerySnapshot> getAllInspections() {
-    return _db
-        .collection('inspections')
-        .orderBy('completedAt', descending: true)
-        .snapshots();
-  }
-
-  // 🔹 Usuario: ver propias
-  Stream<QuerySnapshot> getUserInspections(String uid) {
-    return _db
-        .collection('inspections')
-        .where('userId', isEqualTo: uid)
-        .orderBy('completedAt', descending: true)
-        .snapshots();
   }
 }
