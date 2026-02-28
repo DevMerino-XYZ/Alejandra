@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "197625717024",
+    "project_id": "surveys-alee",
+    "storage_bucket": "surveys-alee.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:197625717024:android:99d4f8e91221b91ad5b745",
+        "android_client_info": {
+          "package_name": "com.example.surveys"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCLAbXax41Q9YwFUeAHKxj1KsGBMxGISpY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
